@@ -1,7 +1,7 @@
 ---
-title: "Binder Public API Reference"
+title: "Binder Public REST API v1 — Overview and Endpoints"
 sidebarTitle: "Overview"
-description: "Binder's public REST API (v1) lets you read public binders, trade lists, and card data. No authentication required — all endpoints are open and CORS-enabled."
+description: "Binder's public REST API v1 gives read-only access to binders, trade lists, and card data. No auth required. CORS open. JSON responses."
 ---
 
 The Binder public API gives developers direct access to public collection data across all supported trading card games. Use it to build portfolio displays, price trackers, trade widgets, or any other tool that reads from Binder's public data — no API keys, no account setup, no approval process required.
@@ -66,3 +66,4 @@ The API uses standard HTTP status codes to communicate the outcome of every requ
 - [GET /trades/{token}](/api-reference/trades)
 - [GET /cards](/api-reference/cards)
 - [GET /cards/{game}/{id}](/api-reference/cards)
+- `GET /api/v1/openapi.json` — available directly from the API, no docs page needed

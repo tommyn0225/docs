@@ -1,10 +1,10 @@
 ---
 title: "GET /api/v1/binders/{id} — Fetch a Public Binder"
 sidebarTitle: "Binders"
-description: "Fetch a public Binder collection by ID. Returns all holdings with card data and the total USD value. Returns 404 for private or non-existent binders."
+description: "Fetch a public Binder collection by ID. Returns all holdings with card data, a total card count, and total USD value. Returns 404 for private binders."
 ---
 
-The **Fetch a Public Binder** endpoint returns the full contents of a public Binder collection, including every card holding with its associated card data and the binder's total estimated value in USD. You can use this endpoint to display a user's collection on an external site, build valuation tools, or integrate Binder data into your own applications.
+The **Fetch a Public Binder** endpoint returns the full contents of a public Binder collection, including every card holding with its associated card data, a total card count, and the binder's total estimated value in USD. You can use this endpoint to display a user's collection on an external site, build valuation tools, or integrate Binder data into your own applications.
 
 <Note>
   Binder is a free service and this endpoint requires no authentication. If a binder owner has set their collection to private, the endpoint returns `404` rather than exposing any data about the binder's existence.
@@ -24,74 +24,102 @@ GET https://yourdomain.com/api/v1/binders/{id}
 
 ## Response
 
-A successful request returns a `200 OK` with a JSON object describing the binder and all of its holdings. Each holding includes a `card_data` object with current pricing information and display metadata sourced from the card's respective game catalog.
+A successful request returns a `200 OK` with a JSON object describing the binder and all of its holdings. Each holding includes a `price` object with current pricing information and display metadata sourced from the card's respective game catalog.
 
 ```json
 {
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "name": "My MTG Collection",
-  "game": "mtg",
-  "created_at": "2024-01-15T10:00:00Z",
-  "total_value_usd": 142.50,
+  "binder": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "My MTG Collection",
+    "game": "mtg"
+  },
+  "card_count": 2,
+  "total_usd": 3.00,
   "holdings": [
     {
-      "id": "660e8400-e29b-41d4-a716-446655440001",
-      "card_id": "abc123",
+      "card_id": "e3285e6b-3e79-4d7c-bf96-d920f973b122",
+      "name": "Lightning Bolt",
       "game": "mtg",
+      "set_name": "Magic 2010",
+      "set_code": "m10",
+      "collector_number": "146",
+      "rarity": "common",
+      "image_url": "https://cards.scryfall.io/normal/front/e/3/e3285e6b-3e79-4d7c-bf96-d920f973b122.jpg",
       "quantity": 2,
       "for_trade": false,
-      "card_data": {
-        "name": "Lightning Bolt",
-        "set": "m10",
-        "type": "Instant",
-        "rarity": "common",
-        "usd": "1.50",
-        "usd_foil": "3.00",
-        "eur": "1.20",
-        "image_uri": "https://cards.scryfall.io/normal/front/e/3/e3285e6b-3e79-4d7c-bf96-d920f973b122.jpg"
-      },
-      "created_at": "2024-01-15T10:00:00Z"
+      "price": {
+        "usd": 1.50,
+        "usd_foil": 3.00,
+        "eur": 1.20
+      }
     }
-  ]
+  ],
+  "attribution": "Card data and pricing courtesy of Scryfall (MTG), PokéWallet (Pokémon), and OPTCG API (One Piece). Binder is an independent, non-commercial tool and exposes only its own value-added layer (binders, holdings, valuation, price history)."
 }
 ```
 
 ### Response Fields
 
-<ResponseField name="id" type="string">
-  The UUID of the binder.
+<ResponseField name="binder" type="object">
+  A summary object for the binder itself.
+
+  <Expandable title="binder">
+    <ResponseField name="id" type="string">
+      The UUID of the binder.
+    </ResponseField>
+
+    <ResponseField name="name" type="string">
+      The display name the owner gave their binder.
+    </ResponseField>
+
+    <ResponseField name="game" type="string">
+      The trading card game this binder is associated with. Possible values: `mtg`, `pokemon`, `onepiece`.
+    </ResponseField>
+  </Expandable>
 </ResponseField>
 
-<ResponseField name="name" type="string">
-  The display name the owner gave their binder.
+<ResponseField name="card_count" type="integer">
+  The total number of individual cards in the binder, calculated as the sum of all holding `quantity` values.
 </ResponseField>
 
-<ResponseField name="game" type="string">
-  The trading card game this binder is associated with. Possible values: `mtg`, `pokemon`, `onepiece`.
-</ResponseField>
-
-<ResponseField name="created_at" type="string">
-  ISO 8601 timestamp indicating when the binder was created.
-</ResponseField>
-
-<ResponseField name="total_value_usd" type="number">
-  The aggregated USD value of all holdings in the binder, calculated using the most recent daily price snapshot. This value reflects the sum of each holding's `card_data.usd` price multiplied by its `quantity`.
+<ResponseField name="total_usd" type="number">
+  The aggregated USD value of all holdings in the binder, calculated using the most recent daily price snapshot. This value reflects the sum of each holding's `price.usd` multiplied by its `quantity`, rounded to two decimal places.
 </ResponseField>
 
 <ResponseField name="holdings" type="array">
   An ordered list of card holdings in the binder. Each element represents a single card entry.
 
   <Expandable title="holdings[]">
-    <ResponseField name="id" type="string">
-      The UUID of the holding record.
-    </ResponseField>
-
     <ResponseField name="card_id" type="string">
       The game-specific identifier for the card (e.g., a Scryfall UUID for MTG cards).
     </ResponseField>
 
+    <ResponseField name="name" type="string">
+      The card's display name.
+    </ResponseField>
+
     <ResponseField name="game" type="string">
       The game this card belongs to. Matches the parent binder's `game` field.
+    </ResponseField>
+
+    <ResponseField name="set_name" type="string">
+      The full name of the set or expansion the card belongs to (e.g., `Magic 2010`).
+    </ResponseField>
+
+    <ResponseField name="set_code" type="string">
+      The short code for the set or expansion (e.g., `m10` for Magic 2010).
+    </ResponseField>
+
+    <ResponseField name="collector_number" type="string">
+      The card's collector number within its set.
+    </ResponseField>
+
+    <ResponseField name="rarity" type="string">
+      The card's rarity (e.g., `common`, `uncommon`, `rare`). May be `null` if rarity data is unavailable.
+    </ResponseField>
+
+    <ResponseField name="image_url" type="string">
+      A direct URL to the card's image, sourced from the game's card image provider. May be `null` if no image is available.
     </ResponseField>
 
     <ResponseField name="quantity" type="integer">
@@ -102,48 +130,28 @@ A successful request returns a `200 OK` with a JSON object describing the binder
       Whether the owner has marked this card as available for trade. See the [Trades endpoint](/api-reference/trades) to fetch a user's dedicated trade list.
     </ResponseField>
 
-    <ResponseField name="card_data" type="object">
-      Normalized card metadata and current pricing pulled from the game catalog.
+    <ResponseField name="price" type="object">
+      Current pricing for this card from the Binder catalog.
 
-      <Expandable title="card_data">
-        <ResponseField name="name" type="string">
-          The card's display name.
+      <Expandable title="price">
+        <ResponseField name="usd" type="number">
+          Current non-foil market price in USD. May be `null` if pricing data is unavailable.
         </ResponseField>
 
-        <ResponseField name="set" type="string">
-          The set or expansion code the card belongs to (e.g., `m10` for Magic 2010).
+        <ResponseField name="usd_foil" type="number">
+          Current foil market price in USD. May be `null` if no foil version exists or pricing is unavailable.
         </ResponseField>
 
-        <ResponseField name="type" type="string">
-          The card's type line (e.g., `Instant`, `Basic Pokémon`).
-        </ResponseField>
-
-        <ResponseField name="rarity" type="string">
-          The card's rarity (e.g., `common`, `uncommon`, `rare`).
-        </ResponseField>
-
-        <ResponseField name="usd" type="string">
-          Current non-foil market price in USD, as a decimal string.
-        </ResponseField>
-
-        <ResponseField name="usd_foil" type="string">
-          Current foil market price in USD, as a decimal string. May be `null` if no foil pricing exists for this card.
-        </ResponseField>
-
-        <ResponseField name="eur" type="string">
-          Current non-foil market price in EUR, as a decimal string. May be `null` if EUR pricing is unavailable.
-        </ResponseField>
-
-        <ResponseField name="image_uri" type="string">
-          A direct URL to the card's image, sourced from the game's card image provider.
+        <ResponseField name="eur" type="number">
+          Current non-foil market price in EUR. May be `null` if EUR pricing is unavailable.
         </ResponseField>
       </Expandable>
     </ResponseField>
-
-    <ResponseField name="created_at" type="string">
-      ISO 8601 timestamp indicating when this holding was added to the binder.
-    </ResponseField>
   </Expandable>
+</ResponseField>
+
+<ResponseField name="attribution" type="string">
+  A required attribution string for upstream card data providers. Include this text when displaying binder data in your application.
 </ResponseField>
 
 ## Error Cases
@@ -156,3 +164,4 @@ A successful request returns a `200 OK` with a JSON object describing the binder
 |--------|---------|
 | `200 OK` | The binder is public and was found successfully. |
 | `404 Not Found` | No public binder exists for the given ID, or the binder is private. |
+| `500 Internal Server Error` | An unexpected server error occurred. |

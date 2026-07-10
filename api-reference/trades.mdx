@@ -1,7 +1,7 @@
 ---
 title: "GET /api/v1/trades/{token} — Fetch a Public Trade List"
 sidebarTitle: "Trades"
-description: "Retrieve a user's public trade list using their share token. Returns cards marked as available for trade. Returns 404 if the list is private or the token is invalid."
+description: "Retrieve a user's public trade list by share token. Returns cards marked for trade and a total count. Returns 404 if private or token is unknown."
 ---
 
 The **Fetch a Public Trade List** endpoint returns all cards a Binder user has marked as available for trade, identified by their unique share token. You can use this endpoint to build trade-matching tools, display a user's trade inventory on an external site, or power trade negotiation workflows.
@@ -24,81 +24,101 @@ GET https://yourdomain.com/api/v1/trades/{token}
 
 ## Response
 
-A successful request returns `200 OK` with a JSON object containing the share token and an array of holdings the user has marked as available for trade. Each holding includes normalized card metadata.
+A successful request returns `200 OK` with a JSON object containing a `total_cards` count, a `cards` array of holdings the user has marked as available for trade, and an `attribution` string. Each card entry includes normalized card metadata and pricing.
 
 ```json
 {
-  "token": "770e8400-e29b-41d4-a716-446655440002",
-  "holdings": [
+  "total_cards": 1,
+  "cards": [
     {
-      "id": "880e8400-e29b-41d4-a716-446655440003",
-      "card_id": "pika001",
+      "card_id": "xy1-25",
+      "name": "Charizard",
       "game": "pokemon",
+      "set_name": "XY Base Set",
+      "set_code": "xy1",
+      "collector_number": "25",
+      "rarity": "rare",
+      "image_url": "https://images.pokewallet.io/xy1-25.jpg",
       "quantity": 1,
-      "card_data": {
-        "name": "Charizard",
-        "set": "base1",
-        "rarity": "rare",
-        "usd": "300.00",
-        "image_uri": "https://images.pokewallet.io/..."
+      "price": {
+        "usd": 300.00,
+        "usd_foil": null,
+        "eur": 275.00
       }
     }
-  ]
+  ],
+  "attribution": "Card data and pricing courtesy of Scryfall (MTG), PokéWallet (Pokémon), and OPTCG API (One Piece). Binder is an independent, non-commercial tool and exposes only its own value-added layer (binders, holdings, valuation, price history)."
 }
 ```
 
 ### Response Fields
 
-<ResponseField name="token" type="string">
-  The share token used to retrieve this trade list. Matches the `{token}` path parameter you provided.
+<ResponseField name="total_cards" type="integer">
+  The total number of individual cards across all trade holdings, calculated as the sum of all `quantity` values.
 </ResponseField>
 
-<ResponseField name="holdings" type="array">
+<ResponseField name="cards" type="array">
   An array of card holdings the user has marked as available for trade. Returns an empty array if the user has no cards marked for trade.
 
-  <Expandable title="holdings[]">
-    <ResponseField name="id" type="string">
-      The UUID of the holding record within the user's binder.
+  <Expandable title="cards[]">
+    <ResponseField name="card_id" type="string">
+      The game-specific identifier for the card. The format varies by game — for example, MTG cards use Scryfall UUIDs while Pokémon cards use a compact identifier like `xy1-25`.
     </ResponseField>
 
-    <ResponseField name="card_id" type="string">
-      The game-specific identifier for the card. The format varies by game — for example, MTG cards use Scryfall UUIDs while Pokémon cards use a compact identifier like `pika001`.
+    <ResponseField name="name" type="string">
+      The card's display name.
     </ResponseField>
 
     <ResponseField name="game" type="string">
       The trading card game this card belongs to. Possible values: `mtg`, `pokemon`, `onepiece`. Trade lists can contain cards from multiple games.
     </ResponseField>
 
+    <ResponseField name="set_name" type="string">
+      The full name of the set or expansion the card belongs to.
+    </ResponseField>
+
+    <ResponseField name="set_code" type="string">
+      The short code for the set or expansion (e.g., `base1` for the Pokémon Base Set).
+    </ResponseField>
+
+    <ResponseField name="collector_number" type="string">
+      The card's collector number within its set.
+    </ResponseField>
+
+    <ResponseField name="rarity" type="string">
+      The card's rarity (e.g., `common`, `uncommon`, `rare`). May be `null` if rarity data is unavailable.
+    </ResponseField>
+
+    <ResponseField name="image_url" type="string">
+      A direct URL to the card's image, sourced from the game's card image provider. May be `null` if no image is available.
+    </ResponseField>
+
     <ResponseField name="quantity" type="integer">
       The number of copies the user is willing to trade.
     </ResponseField>
 
-    <ResponseField name="card_data" type="object">
-      Normalized card metadata and current pricing from the Binder card catalog.
+    <ResponseField name="price" type="object">
+      Current pricing for this card from the Binder catalog.
 
-      <Expandable title="card_data">
-        <ResponseField name="name" type="string">
-          The card's display name.
+      <Expandable title="price">
+        <ResponseField name="usd" type="number">
+          Current non-foil market price in USD. Use this field to estimate the value of a potential trade. May be `null` if pricing data is unavailable.
         </ResponseField>
 
-        <ResponseField name="set" type="string">
-          The set or expansion code (e.g., `base1` for the Pokémon Base Set).
+        <ResponseField name="usd_foil" type="number">
+          Current foil market price in USD. May be `null` if no foil version exists or pricing is unavailable.
         </ResponseField>
 
-        <ResponseField name="rarity" type="string">
-          The card's rarity (e.g., `common`, `uncommon`, `rare`).
-        </ResponseField>
-
-        <ResponseField name="usd" type="string">
-          Current non-foil market price in USD, as a decimal string. Use this field to estimate the value of a potential trade.
-        </ResponseField>
-
-        <ResponseField name="image_uri" type="string">
-          A direct URL to the card's image, sourced from the game's card image provider.
+        <ResponseField name="eur" type="number">
+          Current non-foil market price in EUR. May be `null` if EUR pricing is unavailable.
         </ResponseField>
       </Expandable>
     </ResponseField>
   </Expandable>
+</ResponseField>
+
+<ResponseField name="attribution" type="string">
+  A required attribution string for upstream card data providers. Include this text when displaying trade list data in your application.
 </ResponseField>
 
 ## Error Cases
@@ -109,5 +129,5 @@ A successful request returns `200 OK` with a JSON object containing the share to
 
 | Status | Meaning |
 |--------|---------|
-| `200 OK` | The trade list is public and was found. The `holdings` array may be empty if no cards are marked for trade. |
+| `200 OK` | The trade list is public and was found. The `cards` array may be empty if no cards are marked for trade. |
 | `404 Not Found` | No public trade list exists for the given token, or the trade list is private. |

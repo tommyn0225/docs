@@ -1,13 +1,13 @@
 ---
 title: "GET /api/v1/binders/{id}/history — Binder Value History"
 sidebarTitle: "History"
-description: "Retrieve the daily USD value history for a public binder. Returns a time-series array of date and value pairs. Returns 404 for private binders."
+description: "Retrieve the daily USD value history for a public binder. Returns a time-series of day and total_usd pairs. Returns 404 for private or missing binders."
 ---
 
 The **Binder Value History** endpoint returns a time-series of daily USD valuations for a public binder. Binder records a value snapshot for each binder once per day based on the latest card prices in the catalog. You can use this data to plot a portfolio value chart, track collection growth over time, or build valuation alerts in your own application.
 
 <Note>
-  This endpoint requires no authentication. History is only available for public binders — private binders return `404`. If a binder has been created recently and no snapshot job has run yet, the endpoint returns an empty array rather than an error.
+  This endpoint requires no authentication. History is only available for public binders — private binders return `404`. If a binder has been created recently and no snapshot job has run yet, the `history` array is empty rather than returning an error.
 </Note>
 
 ## Request
@@ -24,39 +24,59 @@ GET https://yourdomain.com/api/v1/binders/{id}/history
 
 ## Response
 
-A successful request returns `200 OK` with a JSON array of daily value snapshots, sorted chronologically from oldest to newest. Each element contains a calendar date and the total binder value in USD recorded on that date.
+A successful request returns `200 OK` with a JSON object containing the `binder_id`, a `history` array of daily value snapshots sorted chronologically from oldest to newest, and an `attribution` string. Each element in `history` contains a calendar date and the total binder value in USD recorded on that date.
 
 ```json
-[
-  { "date": "2024-01-13", "value_usd": 138.20 },
-  { "date": "2024-01-14", "value_usd": 140.75 },
-  { "date": "2024-01-15", "value_usd": 142.50 }
-]
+{
+  "binder_id": "550e8400-e29b-41d4-a716-446655440000",
+  "history": [
+    { "day": "2024-01-13", "total_usd": 138.20 },
+    { "day": "2024-01-14", "total_usd": 140.75 },
+    { "day": "2024-01-15", "total_usd": 142.50 }
+  ],
+  "attribution": "Card data and pricing courtesy of Scryfall (MTG), PokéWallet (Pokémon), and OPTCG API (One Piece). Binder is an independent, non-commercial tool and exposes only its own value-added layer (binders, holdings, valuation, price history)."
+}
 ```
 
-If the binder exists and is public but no snapshot has been recorded yet, the response is an empty array:
+If the binder exists and is public but no snapshot has been recorded yet, the `history` array is empty:
 
 ```json
-[]
+{
+  "binder_id": "550e8400-e29b-41d4-a716-446655440000",
+  "history": [],
+  "attribution": "Card data and pricing courtesy of Scryfall (MTG), PokéWallet (Pokémon), and OPTCG API (One Piece). Binder is an independent, non-commercial tool and exposes only its own value-added layer (binders, holdings, valuation, price history)."
+}
 ```
 
 ### Response Fields
 
-Each element in the returned array is an object with the following fields:
-
-<ResponseField name="date" type="string">
-  The calendar date of the snapshot in `YYYY-MM-DD` format. Each date appears at most once in the array. Dates with no snapshot (e.g., days before the binder was created) are omitted rather than filled with `null`.
+<ResponseField name="binder_id" type="string">
+  The UUID of the binder whose history is returned. Matches the `{id}` path parameter you provided.
 </ResponseField>
 
-<ResponseField name="value_usd" type="number">
-  The total estimated USD value of the binder's holdings on the given date, calculated from the daily price snapshot job. This value is computed as the sum of each holding's price multiplied by its quantity at the time of the snapshot.
+<ResponseField name="history" type="array">
+  A chronologically sorted array of daily value snapshots. Returns an empty array if no snapshots have been recorded yet for this binder.
+
+  <Expandable title="history[]">
+    <ResponseField name="day" type="string">
+      The calendar date of the snapshot in `YYYY-MM-DD` format. Each date appears at most once in the array. Dates with no snapshot (e.g., days before the binder was created) are omitted rather than filled with `null`.
+    </ResponseField>
+
+    <ResponseField name="total_usd" type="number">
+      The total estimated USD value of the binder's holdings on the given date, calculated from the daily price snapshot job. This value is computed as the sum of each holding's price multiplied by its quantity at the time of the snapshot.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="attribution" type="string">
+  A required attribution string for upstream card data providers. Include this text when displaying binder history data in your application.
 </ResponseField>
 
 ## Notes on Data Granularity
 
 - **One data point per day.** Binder runs a single price snapshot job daily, so intra-day price movements are not captured.
 - **Historical depth.** History is available from the date the binder was first created onward. No backfill is performed if a snapshot job is missed.
-- **Price basis.** All `value_usd` figures use non-foil USD prices from the normalized card catalog. Cards without a USD price on a given day contribute `0` to that day's total.
+- **Price basis.** All `total_usd` figures use non-foil USD prices from the normalized card catalog. Cards without a USD price on a given day contribute `0` to that day's total.
 
 ## Error Cases
 
@@ -66,5 +86,6 @@ Each element in the returned array is an object with the following fields:
 
 | Status | Meaning |
 |--------|---------|
-| `200 OK` | The binder is public and was found. The array may be empty if no history has been recorded yet. |
+| `200 OK` | The binder is public and was found. The `history` array may be empty if no snapshots have been recorded yet. |
 | `404 Not Found` | No public binder exists for the given ID, or the binder is private. |
+| `500 Internal Server Error` | An unexpected server error occurred while computing the history. |

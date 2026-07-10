@@ -1,5 +1,5 @@
 ---
-title: "Binder API Authentication and Access"
+title: "Binder Public API Authentication — No Keys Required"
 sidebarTitle: "Authentication"
 description: "The Binder public API requires no authentication. All v1 endpoints are open, read-only, and accessible from any origin with no API keys or tokens needed."
 ---
@@ -42,7 +42,7 @@ The following example shows a minimal fetch call from browser JavaScript. No hea
 ```javascript
 const response = await fetch('https://yourdomain.com/api/v1/binders/YOUR_BINDER_ID');
 const binder = await response.json();
-console.log(binder.name, binder.total_value_usd);
+console.log(binder.name, binder.total_usd);
 ```
 
 Substitute `YOUR_BINDER_ID` with the UUID of any public binder. The same pattern applies to every other v1 endpoint.
