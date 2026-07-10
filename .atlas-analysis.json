@@ -1,0 +1,88 @@
+{
+  "projectType": "saas",
+  "projectName": "Binder",
+  "projectDescription": "A free, multi-game trading card collection tracker for Magic: The Gathering, Pokémon, and One Piece that organizes holdings into binders, tracks live market prices, and surfaces portfolio value over time.",
+  "theme": "almond",
+  "primaryColor": "#7c7c7c",
+  "lightColor": "#080808",
+  "darkColor": "#c1c1c1",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "account-setup"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/binders",
+              "concepts/holdings",
+              "concepts/pricing"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/managing-binders",
+              "guides/searching-cards",
+              "guides/trade-list",
+              "guides/sharing"
+            ]
+          },
+          {
+            "group": "FAQ",
+            "pages": [
+              "faq"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/overview",
+              "api-reference/authentication"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api-reference/binders",
+              "api-reference/history",
+              "api-reference/trades",
+              "api-reference/cards"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Organize physical and digital card collections into named binders (up to 3 per account)",
+    "Support for Magic: The Gathering, Pokémon, and One Piece TCGs",
+    "Live market price tracking with daily USD value snapshots",
+    "Portfolio value chart showing collection value over time",
+    "Trade list — mark cards for trade and share a public trade list via a unique link",
+    "Public binder sharing — make any binder publicly viewable with a shareable URL",
+    "Full-text card search with filters (set, color, type, rarity, price range)",
+    "Public REST API (v1) for developers — no authentication required"
+  ],
+  "publicApiSurface": [
+    "GET /api/v1/binders/{id} — public binder with holdings and total value",
+    "GET /api/v1/binders/{id}/history — daily USD value history for a binder",
+    "GET /api/v1/trades/{token} — public trade list by share token",
+    "GET /api/v1/cards — search the normalized card catalog (q, game, limit params)",
+    "GET /api/v1/cards/{game}/{id} — single card with daily price history",
+    "GET /api/v1/openapi.json — machine-readable OpenAPI 3.0.3 spec"
+  ]
+}

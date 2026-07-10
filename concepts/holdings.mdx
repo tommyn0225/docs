@@ -1,0 +1,51 @@
+---
+title: "Holdings: Cards Inside Your Binders"
+sidebarTitle: "Holdings"
+description: "A holding is a card entry in a binder, with quantity and trade status. Learn how Binder tracks your cards and what data is stored for each holding."
+---
+
+A holding is a single unique card living inside a binder, paired with a count of how many copies you own. Every card you add to a binder becomes a holding. From the binder detail page you can see all your holdings at a glance, update quantities, flag cards for trade, or remove cards you no longer own.
+
+## Quantities
+
+Each holding tracks the number of copies you own with a **quantity** field (minimum 1). If you add a card that already exists in the binder, Binder increments the existing holding's quantity rather than creating a second entry.
+
+<Note>
+  Each card can only appear once per binder. Quantity is how you represent owning multiple copies — you will never see the same card listed twice in a single binder.
+</Note>
+
+This means your binder stays clean and easy to read regardless of how many copies you own, and editing a single holding is all it takes to update your count.
+
+## Card Data Snapshot
+
+When you add a card to a binder, Binder saves a **snapshot** of that card's data at that moment, including:
+
+- Card name
+- Card image
+- Set and collector details
+- Current market prices
+
+This snapshot is stored with the holding. If the upstream card data source is updated, restructured, or a card is removed, your holding is unaffected — the information you captured at add time is preserved in your collection.
+
+Prices within the snapshot are updated automatically on a daily basis. See [Pricing](/concepts/pricing) to learn how price updates work.
+
+## For Trade Flag
+
+Mark any holding as **for trade** to indicate you are willing to trade that card away. Cards marked for trade surface on your public Trade List, making it easy for others browsing your public binder to know what's available.
+
+You can toggle the for-trade status on or off at any time without affecting the holding's quantity or any other data.
+
+## Editing Holdings
+
+Open any binder and select a holding to edit it. From the edit view you can:
+
+- **Change quantity** — Increase or decrease the number of copies.
+- **Toggle for trade** — Mark or unmark the card as available for trade.
+
+Changes are saved immediately. There is no draft or confirmation step.
+
+## Removing Cards
+
+To remove a card from a binder, delete its holding from the binder detail page. This removes the card entry — including its quantity and trade flag — from that binder only.
+
+Deleting a holding does not affect the card globally or remove it from any other binder where it may also exist.

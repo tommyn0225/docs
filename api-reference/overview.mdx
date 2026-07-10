@@ -1,0 +1,68 @@
+---
+title: "Binder Public API Reference"
+sidebarTitle: "Overview"
+description: "Binder's public REST API (v1) lets you read public binders, trade lists, and card data. No authentication required — all endpoints are open and CORS-enabled."
+---
+
+The Binder public API gives developers direct access to public collection data across all supported trading card games. Use it to build portfolio displays, price trackers, trade widgets, or any other tool that reads from Binder's public data — no API keys, no account setup, no approval process required.
+
+## Base URL
+
+All v1 endpoints share the following base URL. Substitute your own hosted domain or the Binder-hosted URL where indicated.
+
+```
+https://yourdomain.com/api/v1
+```
+
+## Key Characteristics
+
+| Property | Value |
+|---|---|
+| Authentication | None required |
+| Methods | GET only (read-only) |
+| Response format | JSON |
+| CORS | Open (`*`) — callable from any frontend or browser |
+| Response caching | 5 minutes (`Cache-Control: max-age=300, stale-while-revalidate=3600`) |
+
+## Available Endpoints
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/binders/{id}` | Retrieve a public binder with its full holdings and total USD value |
+| `GET` | `/binders/{id}/history` | Retrieve the daily USD value history for a public binder |
+| `GET` | `/trades/{token}` | Retrieve a public trade list by its share token |
+| `GET` | `/cards` | Search the card catalog across all supported games |
+| `GET` | `/cards/{game}/{id}` | Retrieve a single card with its daily price history |
+| `GET` | `/openapi.json` | Retrieve the machine-readable OpenAPI specification |
+
+<Note>
+  Endpoints that reference a specific binder or trade list return `404` if that resource is private or does not exist. See [Authentication](/api-reference/authentication) for details on how data visibility works.
+</Note>
+
+## OpenAPI Spec
+
+A machine-readable OpenAPI specification is available at:
+
+```
+GET https://yourdomain.com/api/v1/openapi.json
+```
+
+Use this to generate client SDKs, import into API testing tools like Postman or Insomnia, or integrate with any OpenAPI-compatible toolchain.
+
+## Error Codes
+
+The API uses standard HTTP status codes to communicate the outcome of every request.
+
+| Status | Meaning |
+|---|---|
+| `400 Bad Request` | The request contained invalid or missing parameters. Check your query string values and try again. |
+| `404 Not Found` | The requested resource does not exist, or it is private and not accessible via the public API. |
+| `500 Internal Server Error` | An unexpected error occurred on the server. Retry the request after a short delay. |
+
+## Endpoint Pages
+
+- [GET /binders/{id}](/api-reference/binders)
+- [GET /binders/{id}/history](/api-reference/history)
+- [GET /trades/{token}](/api-reference/trades)
+- [GET /cards](/api-reference/cards)
+- [GET /cards/{game}/{id}](/api-reference/cards)

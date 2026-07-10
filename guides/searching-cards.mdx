@@ -1,0 +1,68 @@
+---
+title: "Search and Add Cards to Your Collection"
+sidebarTitle: "Searching Cards"
+description: "Use Binder's card search to find Magic: The Gathering, Pokémon, and One Piece cards by name, set, type, rarity, color, or price — then add them to your binders."
+---
+
+Binder's search page lets you find any card across all three supported games and add it to a binder in just a few clicks. You can narrow results using a combination of filters — useful when you're looking for something specific, like all rare red creatures in a particular MTG set, or a specific Pokémon from a single expansion.
+
+## Opening the Search
+
+Navigate to the **Search** page from the main navigation. The page is available at `/search`. You can start browsing immediately without entering any filters, or jump straight to a specific card by typing its name.
+
+## Search Filters
+
+Use the following filters — individually or together — to find exactly the cards you're looking for:
+
+| Filter | Description | Available for |
+|---|---|---|
+| Name (`q`) | Text search on the card name | All games |
+| Game | Limit results to Magic: The Gathering, Pokémon, or One Piece TCG | — |
+| Set | Filter by a specific card set or expansion | All games |
+| Color | Filter by color identity (e.g., White, Blue, Black, Red, Green, Colorless, or multicolor combinations) | MTG only |
+| Type | Card type such as Creature, Instant, Sorcery, Pokémon, Event, and more | All games |
+| Rarity | Common, Uncommon, Rare, Mythic Rare, or game-equivalent tiers | All games |
+| Min Price | Show only cards priced at or above a USD threshold | All games |
+| Max Price | Show only cards priced at or below a USD threshold | All games |
+
+Filters are applied dynamically — results update as you change any value.
+
+## Adding a Card to a Binder
+
+<Steps>
+  <Step title="Find the card in results">
+    Use the search filters to locate the card you want. Each result shows the card image, name, set, type, rarity, and price.
+  </Step>
+  <Step title="Click 'Add to Binder'">
+    Select the **Add to Binder** button on the card's result tile.
+  </Step>
+  <Step title="Select the binder">
+    Choose which of your binders to add the card to. Only binders that match the card's game are shown.
+  </Step>
+  <Step title="Enter a quantity">
+    Type how many copies you own. The default is **1**.
+  </Step>
+  <Step title="Confirm">
+    Click **Add**. The card appears in your binder's holdings list with the quantity you entered.
+  </Step>
+</Steps>
+
+<Tip>
+  If the card is already in the binder you select, Binder automatically increments the existing quantity rather than creating a duplicate entry. You don't need to look up the card's current count first.
+</Tip>
+
+## Card Data Shown in Results
+
+Each card result displays the following information:
+
+- **Card image** — the official art for that printing.
+- **Name** — the card's full name.
+- **Set** — the expansion or set the card belongs to.
+- **Type** — the card type line.
+- **Rarity** — the rarity of that printing.
+- **USD price** — the current market price in US dollars.
+
+For **Magic: The Gathering** cards, additional pricing is shown where available:
+
+- **Foil USD price** — the foil printing price in USD.
+- **EUR price** — the non-foil price in euros.

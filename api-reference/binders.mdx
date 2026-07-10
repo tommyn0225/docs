@@ -1,0 +1,158 @@
+---
+title: "GET /api/v1/binders/{id} — Fetch a Public Binder"
+sidebarTitle: "Binders"
+description: "Fetch a public Binder collection by ID. Returns all holdings with card data and the total USD value. Returns 404 for private or non-existent binders."
+---
+
+The **Fetch a Public Binder** endpoint returns the full contents of a public Binder collection, including every card holding with its associated card data and the binder's total estimated value in USD. You can use this endpoint to display a user's collection on an external site, build valuation tools, or integrate Binder data into your own applications.
+
+<Note>
+  Binder is a free service and this endpoint requires no authentication. If a binder owner has set their collection to private, the endpoint returns `404` rather than exposing any data about the binder's existence.
+</Note>
+
+## Request
+
+```http
+GET https://yourdomain.com/api/v1/binders/{id}
+```
+
+### Path Parameters
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the binder, in UUID format. You can find this value in the binder's share URL — for example, `https://yourdomain.com/binders/550e8400-e29b-41d4-a716-446655440000`.
+</ParamField>
+
+## Response
+
+A successful request returns a `200 OK` with a JSON object describing the binder and all of its holdings. Each holding includes a `card_data` object with current pricing information and display metadata sourced from the card's respective game catalog.
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "name": "My MTG Collection",
+  "game": "mtg",
+  "created_at": "2024-01-15T10:00:00Z",
+  "total_value_usd": 142.50,
+  "holdings": [
+    {
+      "id": "660e8400-e29b-41d4-a716-446655440001",
+      "card_id": "abc123",
+      "game": "mtg",
+      "quantity": 2,
+      "for_trade": false,
+      "card_data": {
+        "name": "Lightning Bolt",
+        "set": "m10",
+        "type": "Instant",
+        "rarity": "common",
+        "usd": "1.50",
+        "usd_foil": "3.00",
+        "eur": "1.20",
+        "image_uri": "https://cards.scryfall.io/normal/front/e/3/e3285e6b-3e79-4d7c-bf96-d920f973b122.jpg"
+      },
+      "created_at": "2024-01-15T10:00:00Z"
+    }
+  ]
+}
+```
+
+### Response Fields
+
+<ResponseField name="id" type="string">
+  The UUID of the binder.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  The display name the owner gave their binder.
+</ResponseField>
+
+<ResponseField name="game" type="string">
+  The trading card game this binder is associated with. Possible values: `mtg`, `pokemon`, `onepiece`.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp indicating when the binder was created.
+</ResponseField>
+
+<ResponseField name="total_value_usd" type="number">
+  The aggregated USD value of all holdings in the binder, calculated using the most recent daily price snapshot. This value reflects the sum of each holding's `card_data.usd` price multiplied by its `quantity`.
+</ResponseField>
+
+<ResponseField name="holdings" type="array">
+  An ordered list of card holdings in the binder. Each element represents a single card entry.
+
+  <Expandable title="holdings[]">
+    <ResponseField name="id" type="string">
+      The UUID of the holding record.
+    </ResponseField>
+
+    <ResponseField name="card_id" type="string">
+      The game-specific identifier for the card (e.g., a Scryfall UUID for MTG cards).
+    </ResponseField>
+
+    <ResponseField name="game" type="string">
+      The game this card belongs to. Matches the parent binder's `game` field.
+    </ResponseField>
+
+    <ResponseField name="quantity" type="integer">
+      How many copies of this card the owner has in the binder.
+    </ResponseField>
+
+    <ResponseField name="for_trade" type="boolean">
+      Whether the owner has marked this card as available for trade. See the [Trades endpoint](/api-reference/trades) to fetch a user's dedicated trade list.
+    </ResponseField>
+
+    <ResponseField name="card_data" type="object">
+      Normalized card metadata and current pricing pulled from the game catalog.
+
+      <Expandable title="card_data">
+        <ResponseField name="name" type="string">
+          The card's display name.
+        </ResponseField>
+
+        <ResponseField name="set" type="string">
+          The set or expansion code the card belongs to (e.g., `m10` for Magic 2010).
+        </ResponseField>
+
+        <ResponseField name="type" type="string">
+          The card's type line (e.g., `Instant`, `Basic Pokémon`).
+        </ResponseField>
+
+        <ResponseField name="rarity" type="string">
+          The card's rarity (e.g., `common`, `uncommon`, `rare`).
+        </ResponseField>
+
+        <ResponseField name="usd" type="string">
+          Current non-foil market price in USD, as a decimal string.
+        </ResponseField>
+
+        <ResponseField name="usd_foil" type="string">
+          Current foil market price in USD, as a decimal string. May be `null` if no foil pricing exists for this card.
+        </ResponseField>
+
+        <ResponseField name="eur" type="string">
+          Current non-foil market price in EUR, as a decimal string. May be `null` if EUR pricing is unavailable.
+        </ResponseField>
+
+        <ResponseField name="image_uri" type="string">
+          A direct URL to the card's image, sourced from the game's card image provider.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp indicating when this holding was added to the binder.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Error Cases
+
+<Warning>
+  This endpoint returns `404 Not Found` in two situations: the binder ID does not exist, or the binder owner has set their collection to private. No distinction is made between these two cases to protect user privacy.
+</Warning>
+
+| Status | Meaning |
+|--------|---------|
+| `200 OK` | The binder is public and was found successfully. |
+| `404 Not Found` | No public binder exists for the given ID, or the binder is private. |

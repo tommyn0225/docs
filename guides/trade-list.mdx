@@ -1,0 +1,47 @@
+---
+title: "Build and Share Your TCG Trade List"
+sidebarTitle: "Trade List"
+description: "Mark cards as available for trade across your binders, view them all in one place, and share your trade list with other collectors using a public link."
+---
+
+Your trade list is an aggregated view of every card you've flagged as available for trade across all your binders. Instead of sharing individual binders, you can point other collectors to a single public URL that shows everything you're willing to swap — no account required on their end.
+
+## Marking Cards for Trade
+
+You flag cards for trade from the binder detail page, not from the trade list itself.
+
+1. Open the binder that contains the card.
+2. Click the card's row or its edit icon to open the holding editor.
+3. Toggle **For Trade** to the on position.
+4. Save the holding.
+
+Repeat this for as many cards as you like, across any of your binders.
+
+## Viewing Your Trade List
+
+Go to `/trades` to see your complete trade list. Every holding you've marked 'for trade' — regardless of which binder it lives in — appears here in one consolidated list. The view shows each card's name, image, set, quantity available for trade, and current price.
+
+## Making the Trade List Public
+
+By default your trade list is private and only visible to you.
+
+1. Navigate to `/trades`.
+2. Toggle the **Share trade list** switch to the on position.
+
+Binder generates a unique public URL in the format `/t/{token}` that anyone can open in a browser.
+
+<Note>
+  The share token is auto-generated and cannot be customized. If you toggle sharing off, the link stops working — but the same token is reused when you turn sharing back on, so any links you've already distributed will work again once you re-enable sharing.
+</Note>
+
+## Sharing With Others
+
+Once your trade list is public, copy the `/t/{token}` URL and share it however you like — Discord, Reddit, a trade forum, or a direct message. Visitors can browse your full trade list without creating a Binder account.
+
+## Removing Cards From the Trade List
+
+The trade list has no delete controls of its own. To remove a card, go back to the binder that holds it and toggle **For Trade** off on that holding. The card disappears from `/trades` and from any public trade list URL immediately.
+
+<Info>
+  The trade list is purely a filtered view — it does not move or copy cards. Every card on your trade list still lives in its original binder with its full holding data intact. Removing the 'for trade' flag simply hides it from the trade list view.
+</Info>

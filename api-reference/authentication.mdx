@@ -1,0 +1,48 @@
+---
+title: "Binder API Authentication and Access"
+sidebarTitle: "Authentication"
+description: "The Binder public API requires no authentication. All v1 endpoints are open, read-only, and accessible from any origin with no API keys or tokens needed."
+---
+
+The Binder public API is fully open. You do not need an API key, an access token, an account, or any other credential to make requests. Send a standard HTTP GET request to any v1 endpoint and you will receive a JSON response — nothing else is required.
+
+## No Authentication Required
+
+Every v1 endpoint is read-only and unauthenticated. There are no authorization headers to set, no OAuth flows to complete, and no registration steps to take before you start building.
+
+<Note>
+  The API only exposes data that the collection owner has explicitly marked as public. Read-only access means no request you make can modify, create, or delete any data in Binder.
+</Note>
+
+### Private Resources Return 404, Not 401
+
+When a binder or trade list is set to private by its owner, the API returns `404 Not Found` — not `401 Unauthorized`. This is by design: the existence of a private collection is not disclosed to outside callers. If you receive a `404`, either the resource does not exist or its owner has not made it public.
+
+## CORS
+
+The API sends an open CORS policy (`Access-Control-Allow-Origin: *`) with every response. You can call any v1 endpoint directly from browser-based JavaScript without a proxy, a server-side relay, or any special configuration.
+
+## What Data Is Accessible
+
+The public API surfaces two categories of data:
+
+- **Public binders** — collections that the owner has explicitly set to public. You can retrieve the full holdings list, card data, quantities, and total USD value for any public binder using its ID.
+- **Public trade lists** — trade lists that the owner has shared via a unique share token. Use the token to retrieve the holdings the owner has made available for trade.
+
+Card catalog data (search results and individual card records including price history) is always accessible and is not gated by any owner setting.
+
+## Rate Limits
+
+No formal rate limits are currently documented for the public API. That said, please be respectful with your request frequency — avoid tight polling loops and unnecessary repeated calls. All responses are cached for 5 minutes on the server side (`Cache-Control: max-age=300, stale-while-revalidate=3600`), so polling more frequently than that interval will not return fresher data.
+
+## Example: Unauthenticated Browser Request
+
+The following example shows a minimal fetch call from browser JavaScript. No headers, no tokens — just a plain GET request.
+
+```javascript
+const response = await fetch('https://yourdomain.com/api/v1/binders/YOUR_BINDER_ID');
+const binder = await response.json();
+console.log(binder.name, binder.total_value_usd);
+```
+
+Substitute `YOUR_BINDER_ID` with the UUID of any public binder. The same pattern applies to every other v1 endpoint.

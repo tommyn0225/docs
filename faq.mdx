@@ -1,0 +1,65 @@
+---
+title: "Frequently Asked Questions About Binder"
+sidebarTitle: "FAQ"
+description: "Answers to common questions about Binder's features, supported games, pricing data, sharing, account management, and the public API."
+---
+
+Binder is a free, multi-game trading card collection tracker that helps you manage your cards, monitor their value, and share your collection with others. Below you'll find answers to the most common questions about how Binder works.
+
+<AccordionGroup>
+  <Accordion title="Is Binder free?">
+    Yes — Binder is completely free to use. There is no subscription, no paid tier, and no credit card required. Simply sign up with your email address and password to get started.
+  </Accordion>
+
+  <Accordion title="Which card games are supported?">
+    Binder currently supports **Magic: The Gathering**, **Pokémon**, and **One Piece TCG**. Additional games may be added in the future, so stay tuned for updates.
+  </Accordion>
+
+  <Accordion title="How many binders can I have?">
+    You can create up to **3 binders** per account. We recommend dedicating one binder to each game you collect — for example, one for Magic: The Gathering, one for Pokémon, and one for One Piece.
+  </Accordion>
+
+  <Accordion title="Can a binder have cards from multiple games?">
+    No. Each binder is locked to a single game at the time it is created and cannot hold cards from other games. If you collect multiple games, create a separate binder for each one.
+  </Accordion>
+
+  <Accordion title="How is my collection's value calculated?">
+    Your collection's total value is the sum of **quantity × USD price** for every holding in your binder. Card prices are refreshed automatically every day at approximately **03:00 UTC**, so your collection value stays up to date without any manual effort.
+  </Accordion>
+
+  <Accordion title="How accurate are the card prices?">
+    Prices are sourced from **Scryfall** for Magic: The Gathering cards, and from **PokéWallet** for Pokémon and One Piece cards. These prices reflect standard marketplace values and are a reliable general reference, but they may not match the exact price offered by every individual seller or platform.
+  </Accordion>
+
+  <Accordion title="What happens to prices when I first add a card?">
+    When you add a card to your binder, the current market price is fetched and saved with that holding as a snapshot. From that point on, the price updates automatically each day so your valuation always reflects recent market data.
+  </Accordion>
+
+  <Accordion title="Can I track foil cards?">
+    Yes, with some variation by game. For **Magic: The Gathering**, both a standard USD price and a USD Foil price are stored alongside an EUR price. For **Pokémon** and **One Piece**, a single USD price is tracked. Foil-specific pricing is not currently available for those two games.
+  </Accordion>
+
+  <Accordion title="How do I share my binder?">
+    Open your binder's settings page and toggle it to **public**. You'll receive a shareable link in the format `/b/{id}`. Anyone with that link can view your binder — no account required.
+  </Accordion>
+
+  <Accordion title="How do I share my trade list?">
+    Navigate to the **/trades** page, enable the **Share trade list** toggle, and copy the generated link. Your public trade list is available at `/t/{token}`, and the share token is generated automatically. Visitors can view your trade list without needing an account.
+  </Accordion>
+
+  <Accordion title="Can I add the same card twice?">
+    No duplicate entries are created. If you add a card that already exists in your binder, its **quantity is incremented** rather than creating a second holding. You can adjust the quantity directly from the card entry at any time.
+  </Accordion>
+
+  <Accordion title="Is there a mobile app?">
+    Binder is a web-only application — there is no dedicated iOS or Android app. However, the site is fully responsive and works well in mobile browsers on phones and tablets.
+  </Accordion>
+
+  <Accordion title="Is there an API?">
+    Yes. Binder provides a **public REST API (v1)** that requires no authentication to use. You can use it to programmatically access collection and card data. See the [API Reference](/api-reference/overview) for full documentation, available endpoints, and example requests.
+  </Accordion>
+
+  <Accordion title="How do I delete my account?">
+    To delete your account, please contact support. Be aware that account deletion is **permanent and irreversible** — all of your binders, holdings, and associated data will be removed immediately and cannot be recovered.
+  </Accordion>
+</AccordionGroup>

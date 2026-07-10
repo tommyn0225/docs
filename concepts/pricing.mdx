@@ -1,0 +1,47 @@
+---
+title: "How Binder Tracks Card Market Prices"
+sidebarTitle: "Pricing"
+description: "Binder fetches live market prices for Magic: The Gathering, Pokémon, and One Piece cards and takes daily snapshots to build your portfolio value history."
+---
+
+Binder fetches market prices from established card game data providers and uses them to calculate your collection's total USD value. Prices are stored alongside your holdings, refreshed daily, and displayed on both your dashboard and individual binder pages — giving you an up-to-date picture of what your collection is worth without any manual lookups.
+
+## Price Data by Game
+
+The currencies and price types available for each holding depend on the game:
+
+| Game | Price Fields | Source |
+|---|---|---|
+| Magic: The Gathering | USD, USD Foil, EUR | Scryfall |
+| Pokémon | USD | PokéWallet |
+| One Piece TCG | USD | PokéWallet |
+
+MTG holdings show both a standard and foil price when the data is available, reflecting the real price difference between non-foil and foil printings.
+
+## Snapshot at Add Time
+
+When you add a card to a binder, Binder records the **current market price** as part of the holding's data snapshot. This means:
+
+- Your holdings always have a price on record, even if the card becomes harder to find in the upstream data later.
+- The price stored at add time serves as a baseline that gets replaced as daily updates arrive.
+
+## Daily Price Updates
+
+Binder runs an automatic price refresh job every day at **03:00 UTC**. This job pulls the latest market prices for every card held across all binders and updates each holding's stored price.
+
+You do not need to do anything to trigger this update. The next time you open your dashboard or binder after the job runs, you will see current prices reflected automatically.
+
+## Collection Valuation
+
+Binder uses your holdings' USD prices to calculate collection value in two places:
+
+- **Dashboard** — Shows your **total USD value** summed across all binders, plus a **value-over-time chart** that visualizes how your portfolio has changed as prices fluctuate and your collection grows.
+- **Binder detail page** — Shows the **total USD value** for that individual binder, so you can see the breakdown by game or collection.
+
+## Foil vs. Non-Foil (MTG)
+
+For Magic: The Gathering holdings, Binder displays both the standard USD price and the USD Foil price when both are available. However, **portfolio valuation uses the standard USD price** for consistency across all calculations. The foil price is shown for reference.
+
+<Info>
+  Prices are sourced from third-party data providers (Scryfall and PokéWallet) and are updated on their own schedules. Displayed prices may not perfectly match every marketplace, buylist, or seller listing you encounter. Use them as a market reference, not a guaranteed transaction price.
+</Info>

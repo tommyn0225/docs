@@ -1,0 +1,216 @@
+---
+title: "Card Search and Lookup API Endpoints"
+sidebarTitle: "Cards"
+description: "Search the Binder card catalog across all supported games with GET /api/v1/cards, or fetch a single card with price history using GET /api/v1/cards/{game}/{id}."
+---
+
+Binder maintains a normalized card catalog spanning all supported trading card games. The Cards API gives you two endpoints: a **search endpoint** to query cards by name or game, and a **single-card lookup endpoint** that returns full card details along with a daily price history. Both endpoints are read-only, require no authentication, and return JSON.
+
+---
+
+## Search Cards
+
+`GET /api/v1/cards` searches the catalog and returns a paginated list of matching cards. Use this endpoint to build autocomplete fields, populate card pickers, or let users browse cards across games.
+
+### Request
+
+```http
+GET https://yourdomain.com/api/v1/cards
+```
+
+### Query Parameters
+
+<ParamField query="q" type="string">
+  A text search string matched against card names. The search is case-insensitive and matches partial names — for example, `q=bolt` returns "Lightning Bolt", "Thunderbolt", and similar cards. Omit this parameter to retrieve cards without filtering by name.
+</ParamField>
+
+<ParamField query="game" type="string">
+  Filter results to a single game. Accepted values are `mtg`, `pokemon`, and `onepiece`. Omit this parameter to search across all supported games simultaneously.
+</ParamField>
+
+<ParamField query="limit" type="integer">
+  The maximum number of cards to return per request. Accepts values between `1` and `100`. Defaults to `50` if omitted.
+</ParamField>
+
+### Response
+
+A successful request returns `200 OK` with a JSON object containing a `cards` array and a `total` count.
+
+```json
+{
+  "cards": [
+    {
+      "id": "e3285e6b-3e79-4d7c-bf96-d920f973b122",
+      "name": "Lightning Bolt",
+      "game": "mtg",
+      "set": "m10",
+      "type": "Instant",
+      "rarity": "common",
+      "usd": "1.50",
+      "usd_foil": "3.00",
+      "eur": "1.20",
+      "image_uri": "https://cards.scryfall.io/normal/front/e/3/e3285e6b.jpg"
+    }
+  ],
+  "total": 1
+}
+```
+
+#### Response Fields
+
+<ResponseField name="cards" type="array">
+  An array of matching card objects, up to the requested `limit`. Returns an empty array if no cards match your query.
+
+  <Expandable title="cards[]">
+    <ResponseField name="id" type="string">
+      The Binder-internal card identifier. For MTG cards, this is the card's Scryfall UUID. For other games, the format is game-specific.
+    </ResponseField>
+
+    <ResponseField name="name" type="string">
+      The card's display name.
+    </ResponseField>
+
+    <ResponseField name="game" type="string">
+      The trading card game this card belongs to: `mtg`, `pokemon`, or `onepiece`.
+    </ResponseField>
+
+    <ResponseField name="set" type="string">
+      The set or expansion code (e.g., `m10` for Magic 2010, `base1` for Pokémon Base Set).
+    </ResponseField>
+
+    <ResponseField name="type" type="string">
+      The card's type line (e.g., `Instant`, `Basic Pokémon`, `Character`).
+    </ResponseField>
+
+    <ResponseField name="rarity" type="string">
+      The card's rarity (e.g., `common`, `uncommon`, `rare`).
+    </ResponseField>
+
+    <ResponseField name="usd" type="string">
+      Current non-foil market price in USD, as a decimal string. May be `null` if pricing data is unavailable.
+    </ResponseField>
+
+    <ResponseField name="usd_foil" type="string">
+      Current foil market price in USD, as a decimal string. May be `null` if no foil version exists or pricing is unavailable.
+    </ResponseField>
+
+    <ResponseField name="eur" type="string">
+      Current non-foil market price in EUR, as a decimal string. May be `null` if EUR pricing is unavailable for this card.
+    </ResponseField>
+
+    <ResponseField name="image_uri" type="string">
+      A direct URL to the card's image, sourced from the game's card image provider.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="total" type="integer">
+  The total number of cards matching your query, regardless of the `limit` you specified. Use this value to determine whether additional results exist beyond the current page.
+</ResponseField>
+
+<Note>
+  The Cards API does not currently support offset or cursor-based pagination. If `total` exceeds your `limit`, narrow your search using the `q` or `game` parameters.
+</Note>
+
+---
+
+## Fetch a Single Card
+
+`GET /api/v1/cards/{game}/{id}` returns the full details for one card, including its daily price history. Use this endpoint to render a card detail view, display a price chart, or look up current pricing for a specific printing.
+
+### Request
+
+```http
+GET https://yourdomain.com/api/v1/cards/{game}/{id}
+```
+
+### Path Parameters
+
+<ParamField path="game" type="string" required>
+  The trading card game the card belongs to. Must be one of `mtg`, `pokemon`, or `onepiece`. This value is case-sensitive.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  The card's game-specific identifier. For MTG, this is the Scryfall UUID (e.g., `e3285e6b-3e79-4d7c-bf96-d920f973b122`). For Pokémon, it's a compact identifier such as `pika001`. You can obtain the correct `id` for any card from the [Search Cards](#search-cards) endpoint.
+</ParamField>
+
+### Response
+
+A successful request returns `200 OK` with a JSON object containing the card's full metadata and a `price_history` array of daily USD price snapshots sorted chronologically from oldest to newest.
+
+```json
+{
+  "id": "pika001",
+  "name": "Pikachu",
+  "game": "pokemon",
+  "set": "base1",
+  "type": "Basic Pokémon",
+  "rarity": "common",
+  "usd": "15.00",
+  "image_uri": "https://images.pokewallet.io/pikachu.jpg",
+  "price_history": [
+    { "date": "2024-01-13", "price_usd": 14.50 },
+    { "date": "2024-01-14", "price_usd": 14.75 },
+    { "date": "2024-01-15", "price_usd": 15.00 }
+  ]
+}
+```
+
+#### Response Fields
+
+<ResponseField name="id" type="string">
+  The card's game-specific identifier, matching the `{id}` path parameter you provided.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  The card's display name.
+</ResponseField>
+
+<ResponseField name="game" type="string">
+  The trading card game this card belongs to: `mtg`, `pokemon`, or `onepiece`.
+</ResponseField>
+
+<ResponseField name="set" type="string">
+  The set or expansion code the card belongs to.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  The card's type line.
+</ResponseField>
+
+<ResponseField name="rarity" type="string">
+  The card's rarity.
+</ResponseField>
+
+<ResponseField name="usd" type="string">
+  The card's current non-foil market price in USD as of the most recent daily snapshot, returned as a decimal string.
+</ResponseField>
+
+<ResponseField name="image_uri" type="string">
+  A direct URL to the card's image, sourced from the appropriate game image provider.
+</ResponseField>
+
+<ResponseField name="price_history" type="array">
+  A chronologically sorted array of daily USD price snapshots. Each element represents one day's recorded price.
+
+  <Expandable title="price_history[]">
+    <ResponseField name="date" type="string">
+      The calendar date of the price snapshot in `YYYY-MM-DD` format.
+    </ResponseField>
+
+    <ResponseField name="price_usd" type="number">
+      The non-foil USD market price recorded on that date.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Error Cases
+
+<Warning>
+  Both card endpoints return `404 Not Found` if the specified card does not exist in the Binder catalog. Verify that the `game` and `id` values you're using are correct — an invalid `game` value or a mismatched `id` for the given game will both result in a `404`.
+</Warning>
+
+| Status | Meaning |
+|--------|---------|
+| `200 OK` | The card was found and returned successfully. |
+| `404 Not Found` | No card exists in the catalog for the given `game` and `id` combination. |

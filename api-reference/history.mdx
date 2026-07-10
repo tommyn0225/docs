@@ -1,0 +1,70 @@
+---
+title: "GET /api/v1/binders/{id}/history — Binder Value History"
+sidebarTitle: "History"
+description: "Retrieve the daily USD value history for a public binder. Returns a time-series array of date and value pairs. Returns 404 for private binders."
+---
+
+The **Binder Value History** endpoint returns a time-series of daily USD valuations for a public binder. Binder records a value snapshot for each binder once per day based on the latest card prices in the catalog. You can use this data to plot a portfolio value chart, track collection growth over time, or build valuation alerts in your own application.
+
+<Note>
+  This endpoint requires no authentication. History is only available for public binders — private binders return `404`. If a binder has been created recently and no snapshot job has run yet, the endpoint returns an empty array rather than an error.
+</Note>
+
+## Request
+
+```http
+GET https://yourdomain.com/api/v1/binders/{id}/history
+```
+
+### Path Parameters
+
+<ParamField path="id" type="string" required>
+  The UUID of the binder whose value history you want to retrieve. This is the same identifier used by the [Fetch a Public Binder](/api-reference/binders) endpoint and appears in the binder's share URL.
+</ParamField>
+
+## Response
+
+A successful request returns `200 OK` with a JSON array of daily value snapshots, sorted chronologically from oldest to newest. Each element contains a calendar date and the total binder value in USD recorded on that date.
+
+```json
+[
+  { "date": "2024-01-13", "value_usd": 138.20 },
+  { "date": "2024-01-14", "value_usd": 140.75 },
+  { "date": "2024-01-15", "value_usd": 142.50 }
+]
+```
+
+If the binder exists and is public but no snapshot has been recorded yet, the response is an empty array:
+
+```json
+[]
+```
+
+### Response Fields
+
+Each element in the returned array is an object with the following fields:
+
+<ResponseField name="date" type="string">
+  The calendar date of the snapshot in `YYYY-MM-DD` format. Each date appears at most once in the array. Dates with no snapshot (e.g., days before the binder was created) are omitted rather than filled with `null`.
+</ResponseField>
+
+<ResponseField name="value_usd" type="number">
+  The total estimated USD value of the binder's holdings on the given date, calculated from the daily price snapshot job. This value is computed as the sum of each holding's price multiplied by its quantity at the time of the snapshot.
+</ResponseField>
+
+## Notes on Data Granularity
+
+- **One data point per day.** Binder runs a single price snapshot job daily, so intra-day price movements are not captured.
+- **Historical depth.** History is available from the date the binder was first created onward. No backfill is performed if a snapshot job is missed.
+- **Price basis.** All `value_usd` figures use non-foil USD prices from the normalized card catalog. Cards without a USD price on a given day contribute `0` to that day's total.
+
+## Error Cases
+
+<Warning>
+  This endpoint returns `404 Not Found` if the binder does not exist or if the binder owner has set their collection to private. Both cases return the same status code to protect user privacy.
+</Warning>
+
+| Status | Meaning |
+|--------|---------|
+| `200 OK` | The binder is public and was found. The array may be empty if no history has been recorded yet. |
+| `404 Not Found` | No public binder exists for the given ID, or the binder is private. |
